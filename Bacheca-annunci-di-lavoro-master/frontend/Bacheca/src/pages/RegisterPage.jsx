@@ -1,51 +1,79 @@
-// In Bacheca-annunci-di-lavoro-master/frontend/Bacheca/src/pages/RegisterPage.jsx
+/**
+ * @file RegisterPage.jsx
+ * @description Page for user registration.
+ * Allows new users to register as either a 'candidato' (candidate) or 'azienda' (company).
+ */
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-// import 'bootstrap/dist/css/bootstrap.min.css'; // Ensure bootstrap is imported, ideally globally in main.jsx or App.jsx
+import AlertMessage from '../components/AlertMessage'; // Import AlertMessage
 
+/**
+ * Renders the user registration page.
+ * Contains a form for name, email, password, and role selection.
+ * Handles form submission, calls the registration function from AuthContext,
+ * and redirects upon successful registration and authentication.
+ * @returns {JSX.Element} The RegisterPage component.
+ */
 export default function RegisterPage() {
+  /** @state {string} name - The full name input by the user. */
   const [name, setName] = useState('');
+  /** @state {string} email - The email address input by the user. */
   const [email, setEmail] = useState('');
+  /** @state {string} password - The password input by the user. */
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('candidato'); // Default role
+  /** @state {string} role - The selected role ('candidato' or 'azienda'). Defaults to 'candidato'. */
+  const [role, setRole] = useState('candidato');
+  /** @state {string} error - Error message related to registration. */
   const [error, setError] = useState('');
-  const [loading, setLoadingState] = useState(false); // Renamed to avoid conflict with AuthContext's loading
+  /** @state {boolean} pageLoading - True if the registration process is ongoing (form submission). Renamed from 'loading' to avoid conflict. */
+  const [pageLoading, setPageLoading] = useState(false);
 
-  const { register, isAuthenticated, role: userRole, loading: authLoading } = useAuth(); // Destructure loading as authLoading
+  const { register, isAuthenticated, role: userRole, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
+  /**
+   * Effect to redirect users if they become authenticated (e.g., after successful registration).
+   * Navigates to the appropriate dashboard based on their role.
+   */
   useEffect(() => {
     if (isAuthenticated) {
-      // Redirect based on role after successful registration and authentication
       if (userRole === 'azienda') {
         navigate('/dashboard-azienda');
       } else if (userRole === 'candidato') {
         navigate('/dashboard-candidato');
       } else {
-        navigate('/'); // Fallback, though role should be set
+        navigate('/'); // Fallback if role is somehow not set
       }
     }
   }, [isAuthenticated, userRole, navigate]);
 
+  /**
+   * Handles the registration form submission.
+   * Calls the `register` function from AuthContext.
+   * @param {React.FormEvent<HTMLFormElement>} e - The form submission event.
+   * @async
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setLoadingState(true);
+    setError(''); // Clear previous errors
+    setPageLoading(true);
     try {
+      // TODO: Ensure AuthContext.register is fully implemented and handles errors properly.
       await register(name, email, password, role);
-      // Navigation is handled by useEffect
+      // Navigation on success is handled by the useEffect hook watching `isAuthenticated`.
     } catch (err) {
-      // The register function in AuthContext should ideally throw an error or return a value indicating failure
+      // This catch block will handle errors thrown by the register function in AuthContext
+      // or other errors during the submission process.
       console.error("Registration Page Error:", err);
       setError(err.message || 'Failed to register. Please try again.');
     } finally {
-      setLoadingState(false);
+      setPageLoading(false);
     }
   };
 
-  // Use authLoading to disable form if AuthContext is busy (e.g. during token verification or existing operations)
-  const formDisabled = loading || authLoading;
+  // Disable form elements if either the page is submitting or AuthContext is in a loading state.
+  const formDisabled = pageLoading || authLoading;
 
   return (
     <div className="container mt-5">
@@ -54,7 +82,7 @@ export default function RegisterPage() {
           <div className="card">
             <div className="card-body">
               <h2 className="card-title text-center mb-4">Registrati</h2>
-              {error && <div className="alert alert-danger">{error}</div>}
+              {error && <AlertMessage type="danger" message={error} />}
               <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                   <label htmlFor="nameInput" className="form-label">Nome Completo</label>
@@ -106,7 +134,7 @@ export default function RegisterPage() {
                   </select>
                 </div>
                 <button type="submit" className="btn btn-primary w-100" disabled={formDisabled}>
-                  {loading ? 'Registrazione in corso...' : 'Registrati'}
+                  {pageLoading ? 'Registrazione in corso...' : 'Registrati'}
                 </button>
               </form>
             </div>
