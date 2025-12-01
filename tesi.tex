@@ -1,0 +1,98 @@
+\PassOptionsToPackage{table, dvipsnames}{xcolor} %In pratica dice a LaTeX: “Quando carichi il pacchetto xcolor, passa queste opzioni”. table permette di colorare anche le tabelle (es. righe o colonne). dvipsnames abilita un set di ~68 colori predefiniti con nomi leggibili.xcolor è un pacchetto LaTeX per gestire i colori in documenti, figure, tabelle, grafici, testi, ecc
+\documentclass[a4paper,twoside,12pt]{toptesi}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel} %Gestione e codifica della lingua italiana
+\usepackage{graphicx}  % Required for inserting images
+\usepackage{tikz} %per flowchart, diagrammi di flusso o modelli di process
+\usetikzlibrary{positioning}  %Senza positioning dovresti calcolare coordinate (x,y) manualmente, il che è lungo e soggetto a errori
+\usepackage{pgfplots}  %PGFPlots è costruito sopra TikZ, specifico per grafici di dati e funzioni matematiche.
+\usepackage[newfloat]{minted}  %permette di inserire codice sorgente evidenziato (syntax highlighting) all’interno del documento. Supporta tantissimi linguaggi: Python, Java, C++, SQL, HTML, ecc. [newfloat permette di trattare i blocchi di codice come veri e propri float, cioè oggetti simili a figure o tabelle. \SetupFloatingEnvironment{listing}{name=Codice}]
+\usepackage[font=small,skip=1pt]{caption}  %Serve per personalizzare l’aspetto delle didascalie di figure, tabelle e, se usi minted[newfloat], anche dei blocchi di codice (float)
+\captionsetup[listing]{position=top} %Dice a LaTeX di mettere la didascalia sopra il blocco di codice, invece che sotto (default).
+\usepackage{subcaption} %subcaption è un pacchetto LaTeX che permette di gestire sottodidascalie all’interno di figure o tabelle. Serve quando vuoi avere più immagini o grafici in un unico blocco, ognuno con la sua didascalia, ma comunque raggruppati sotto un’unica figura principale.
+\pgfplotsset{compat=1.18}
+
+\SetupFloatingEnvironment{listing}{name=Codice} %“Codice 1, Codice 2…” è più leggibile e professionale per una tesi italiana rispetto a “Listing 1…”
+
+\newcommand{\walter}[1]{\textcolor{red}{{\bf [Walter: }{#1}{\bf ]}}}
+
+\usepackage{hyperref} %Aggiunge link cliccabili
+
+%questo rende cliccabili i link, l’indice, le citazioni, ecc.
+\hypersetup{
+    colorlinks = true,
+    allcolors=black
+}
+
+%%% workaround for listing
+% save the current meaning of \listing
+\let\savedlisting\listing
+% at the right spot, restore the meaning
+\AtBeginDocument{\let\listing\savedlisting}
+%%% end of workaround
+
+
+\def\dept{DIPARTIMENTO DI INGEGNERIA ELETTRICA E DELL'INFORMAZIONE}
+\def\course{Corso di Laurea in Ingegneria Informatica e dell’Automazione}
+\def\title{Titolo della tesi}
+\def\author{Nicholas Agrusti}
+\def\prof{Prof. Ing. Ciccio Cappuccio}
+\def\subject{Intelligenza Artificiale}
+\def\annoacc{2022 - 2023}
+\def\beforecandidate{Laureando}
+\def\beforetitle{Tesi di Laurea in}
+\def\beforeprof{Relatore}
+\def\beforeannoacc{Anno Accademico}
+%Queste variabili servono per generare automaticamente il frontespizio
+
+\makeatletter
+\def\cleardoublepage{\clearpage\if@twoside \ifodd\c@page\else
+    \hbox{}
+    \vspace*{\fill}
+    \vspace{\fill}
+    \thispagestyle{empty}
+    \newpage
+    \if@twocolumn\hbox{}\newpage\fi\fi\fi}
+\makeatother
+%In LaTeX, il comando \cleardoublepage serve a terminare la pagina corrente e, se il documento è a due facciate (twoside), fa in modo che la pagina successiva inizi sempre su destra (pagina dispari
+
+
+\begin{document}
+
+%\maketitle
+
+\begingroup
+\thispagestyle{empty}
+\input{front}       % frontespizio
+\endgroup
+
+\cleardoublepage
+\input{dedica} %%include sezioni piccole (senza cambiare pagina)
+
+\cleardoublepage
+
+\pagenumbering{roman}
+
+\input{abstract} %Presentare l’argomento principale della tesi. Riassumere obiettivi, metodo e risultati principali.
+
+\cleardoublepage
+
+\tableofcontents %genera automaticamente l’indice
+
+\cleardoublepage
+
+\pagenumbering{arabic}
+\setcounter{page}{1}
+%\include{introduzione}
+%\include{capitolo_1}
+%\include{capitolo_2}
+%\include{capitolo_3}
+%\include{capitolo_4}
+%\include{conclusione}
+%\include{ringraziamenti}
+
+
+\bibliographystyle{plain}
+\bibliography{bibliografia} %crea la bibliografia finale.
+\end{document}
